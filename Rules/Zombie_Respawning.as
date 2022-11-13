@@ -3,7 +3,6 @@
 #define SERVER_ONLY
 
 const string startClass = "builder";  //the class that players will spawn as
-const u32 spawnTimeLeniency = 30;     //players can insta-respawn for this many seconds after dawn comes
 const u32 spawnTimeMargin = 8;        //max amount of random seconds we can give to respawns
 
 shared class Respawn
@@ -65,13 +64,17 @@ void onPlayerRequestSpawn(CRules@ this, CPlayer@ player)
 {
 	if (!isRespawnAdded(this, player.getUsername()))
 	{
+		CMap@ map = getMap();
+		const u32 dayTime = map.getDayTime();
+	
 		const u32 gametime = getGameTime();
 		const u32 day_cycle = this.daycycle_speed * 60;
 		
 		const u32 timeElapsed = (gametime / getTicksASecond()) % day_cycle;
 		const s32 timeTillDawn = (day_cycle - timeElapsed + XORRandom(spawnTimeMargin)) * getTicksASecond();
 		
-		const bool skipWait = timeElapsed <= spawnTimeLeniency || this.isWarmup();
+		const bool isDay = dayTime > 0.1f && dayTime < 0.8f;
+		const bool skipWait = isDay || this.isWarmup();
 		const s32 timeTillRespawn = skipWait ? 0 : timeTillDawn;
 		
 		Respawn r(player.getUsername(), timeTillRespawn + gametime);
