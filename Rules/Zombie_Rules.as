@@ -48,9 +48,18 @@ void onTick(CRules@ this)
 	const f32 difficulty = days_to_survive / (dayNumber * game_difficulty);
 	const u32 spawnRate = getTicksASecond() * difficulty;
 
-	if (map.getDayTime() > 0.9f && showNightStart) {
-		setTimedGlobalMessage(this, "Survive. Respawns are now disabled", 10);
-		showNightStart = false;
+	if (map.getDayTime() > 0.85f) {
+		if (showNightStart) {
+			string text = "";
+			if (dayNumber < warmup_days) {
+				text = "Survive.";
+			}
+			else {
+				text = "Survive. Respawns are now disabled";
+			}
+			setTimedGlobalMessage(this, text, 10);
+			showNightStart = false;
+		}
 	}
 	else {
 		showNightStart = true;
