@@ -35,6 +35,7 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 	player.server_setTeamNum(0);
 }
 
+bool showNightStart = true;
 void onTick(CRules@ this)
 {
 	CMap@ map = getMap();
@@ -46,7 +47,15 @@ void onTick(CRules@ this)
 	//spawn zombies at night-time
 	const f32 difficulty = days_to_survive / (dayNumber * game_difficulty);
 	const u32 spawnRate = getTicksASecond() * difficulty;
-	
+
+	if (map.getDayTime() > 0.9f && showNightStart) {
+		setTimedGlobalMessage(this, "Survive. Respawns are now disabled", 10);
+		showNightStart = false;
+	}
+	else {
+		showNightStart = true;
+	}
+
 	if (gameTime % spawnRate == 0)
 	{
 		spawnZombie(map);
@@ -187,6 +196,12 @@ void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData
 // Check if we lost the game
 const bool isGameLost()
 {
+	CMap@ map = getMap();
+
+	if (map.getDayTime() > 0.0f && map.getDayTime() < 0.9f) { 
+		return false;
+	}
+
 	bool noAlivePlayers = true;
 	
 	const u8 playerCount = getPlayerCount();
@@ -202,6 +217,7 @@ const bool isGameLost()
 			break;
 		}
 	}
+
 	
 	return noAlivePlayers;
 }
