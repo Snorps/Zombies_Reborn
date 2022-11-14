@@ -65,7 +65,7 @@ void onTick(CRules@ this)
 // Spawn various zombie blobs on the map
 void spawnZombie(CMap@ map)
 {
-	if (map.getDayTime() > 0.8f || map.getDayTime() < 0.1f)
+	if (map.getDayTime() > 0.9f || map.getDayTime() < 0.1f)
 	{
 		const u32 r = XORRandom(100);
 		

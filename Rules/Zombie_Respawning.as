@@ -74,7 +74,7 @@ void onPlayerRequestSpawn(CRules@ this, CPlayer@ player)
 		const s32 randomTime = XORRandom(spawnTimeMargin);
 		const s32 timeTillDawn = (day_cycle - timeElapsed + randomTime) * getTicksASecond();
 		
-		const bool isDay = dayTime > 0.0f && dayTime < 0.8f;
+		const bool isDay = dayTime > 0.0f && dayTime < 0.9f;
 		printf("Player Spawn Requested - Day time: " + dayTime + "    Is Day: " + isDay + "    Random Additional Time: " + randomTime + "    Time Till Dawn: " + (timeTillDawn/60));
 		const bool skipWait = isDay || this.isWarmup();
 		const s32 timeTillRespawn = skipWait ? 0 : timeTillDawn;
