@@ -55,7 +55,7 @@ void onTick(CRules@ this)
 				text = "Survive.";
 			}
 			else {
-				text = "Survive. Respawns are now disabled";
+				text = "Survive.\n\nRespawns are now disabled.";
 			}
 			setTimedGlobalMessage(this, text, 10);
 			showNightStart = false;
