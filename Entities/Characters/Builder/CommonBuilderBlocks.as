@@ -109,7 +109,7 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks, int team_num = 0, const stri
 	
 	BuildBlock[] page_1;
 	blocks.push_back(page_1);
-	{
+	/*{
 		BuildBlock b(0, "windmill", getTeamIcon("windmill", "WindMill.png", team_num, Vec2f(64, 102), 1), ZombieDesc::windmill);
 		AddRequirement(b.reqs, "blob", "mat_wood", "Wood", 200);
 		AddRequirement(b.reqs, "blob", "mat_stone", "Stone", 250);
@@ -132,7 +132,15 @@ void addCommonBuilderBlocks(BuildBlock[][]@ blocks, int team_num = 0, const stri
 		b.buildOnGround = true;
 		b.size.Set(40, 32);
 		blocks[1].push_back(b);
-	}
+	}*/
+	/*{
+		BuildBlock b(0, "outpost", getTeamIcon("outpost", "Outpost.png", team_num, Vec2f(40, 32)), "Outpost");
+		AddRequirement(b.reqs, "blob", "mat_wood", "Wood\n", 300);
+		AddRequirement(b.reqs, "blob", "mat_stone", "Stone\n", 150);		
+		b.buildOnGround = true;
+		b.size.Set(40, 32);
+		blocks[1].push_back(b);
+	}*/
 }
 
 ConfigFile@ openBlockBindingsConfig()

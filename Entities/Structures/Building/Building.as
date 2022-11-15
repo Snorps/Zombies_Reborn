@@ -25,7 +25,7 @@ void onInit(CBlob@ this)
 
 	// SHOP
 	this.set_Vec2f("shop offset", Vec2f(0, 0));
-	this.set_Vec2f("shop menu size", Vec2f(4, 4));
+	this.set_Vec2f("shop menu size", Vec2f(4, 5));
 	this.set_string("shop description", "Construct");
 	this.set_u8("shop icon", 12);
 	this.Tag(SHOP_AUTOCLOSE);
@@ -36,10 +36,10 @@ void onInit(CBlob@ this)
 		ShopItem@ s = addShopItem(this, "Builder Shop", getTeamIcon("buildershop", "BuilderShop.png", team_num, Vec2f(40, 24)), "buildershop", Descriptions::buildershop);
 		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", CTFCosts::buildershop_wood);
 	}
-	/*{
+	{
 		ShopItem@ s = addShopItem(this, "Quarters", getTeamIcon("quarters", "Quarters.png", team_num, Vec2f(40, 24), 2), "quarters", Descriptions::quarters);
 		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", CTFCosts::quarters_wood);
-	}*/
+	}
 	{
 		ShopItem@ s = addShopItem(this, "Knight Shop", getTeamIcon("knightshop", "KnightShop.png", team_num, Vec2f(40, 24)), "knightshop", Descriptions::knightshop);
 		AddRequirement(s.requirements, "blob", "mat_wood", "Wood", CTFCosts::knightshop_wood);
