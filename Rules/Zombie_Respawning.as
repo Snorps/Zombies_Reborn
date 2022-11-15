@@ -2,8 +2,9 @@
 
 #define SERVER_ONLY
 
-const string startClass = "builder";  //the class that players will spawn as
-const u32 spawnTimeMargin = 8;        //max amount of random seconds we can give to respawns
+const string startClass = "builder";   //the class that players will spawn as
+const u32 spawnTimeMargin = 8;         //max amount of random seconds we can give to respawns
+const u32 baseRespawnTimeOutpost = 36; //base respawn time when there is an outpost on the map
 
 shared class Respawn
 {
@@ -75,10 +76,23 @@ void onPlayerRequestSpawn(CRules@ this, CPlayer@ player)
 		const s32 timeTillDawn = (day_cycle - timeElapsed + randomTime) * getTicksASecond();
 		
 		const bool isDay = dayTime > 0.0f && dayTime < 0.9f;
-		printf("Player Spawn Requested - Day time: " + dayTime + "    Is Day: " + isDay + "    Random Additional Time: " + randomTime + "    Time Till Dawn: " + (timeTillDawn/60));
-		const bool skipWait = isDay || this.isWarmup();
-		const s32 timeTillRespawn = skipWait ? 0 : timeTillDawn;
+		//printf("Player Spawn Requested - Day time: " + dayTime + "    Is Day: " + isDay + "    Random Additional Time: " + randomTime + "    Time Till Dawn: " + (timeTillDawn/getTicksASecond()) + "    Game Time: " + (gametime/getTicksASecond()));
 		
+		bool skipWait = isDay || this.isWarmup();
+
+		//printf("Skip wait: " + skipWait);
+
+		s32 timeTillRespawn = skipWait ? 0 : timeTillDawn;
+
+		//printf("timetillresppawn:" + timeTillRespawn/getTicksASecond());
+
+		CBlob@[] posts;
+		getBlobsByTag("respawn", @posts);
+		//printf("outposts: " + posts.length());
+		if (posts.length() > 0 && timeTillRespawn > baseRespawnTimeOutpost) { //reduce respawn time if outpost is present
+			timeTillRespawn = (baseRespawnTimeOutpost + XORRandom(spawnTimeMargin)) * getTicksASecond();
+		}
+
 		Respawn r(player.getUsername(), timeTillRespawn + gametime);
 		this.push("respawns", r);
 		syncRespawnTime(this, player, timeTillRespawn + gametime);
