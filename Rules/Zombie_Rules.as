@@ -1,4 +1,7 @@
 // Zombie Fortress generic rules
+#include "MakeCrate.as";
+#include "TeamIconToken.as"
+
 
 #define SERVER_ONLY
 
@@ -36,6 +39,7 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 }
 
 bool showNightStart = true;
+bool makeOutpostCrate = true;
 void onTick(CRules@ this)
 {
 	CMap@ map = getMap();
@@ -47,6 +51,12 @@ void onTick(CRules@ this)
 	//spawn zombies at night-time
 	const f32 difficulty = days_to_survive / (dayNumber * game_difficulty);
 	const u32 spawnRate = getTicksASecond() * difficulty;
+
+	const Vec2f dim = getMap().getMapDimensions();
+	if (gameTime % 150 == 0 && makeOutpostCrate) {	
+		CBlob@ crate = server_MakeCrateOnParachute("outpost", "Outpost", 11, 0, Vec2f(dim.x/2, -1));
+		makeOutpostCrate = false;
+	}
 
 	if (map.getDayTime() > 0.85f) {
 		if (showNightStart) {
@@ -207,9 +217,16 @@ const bool isGameLost()
 {
 	CMap@ map = getMap();
 
-	if (map.getDayTime() > 0.0f && map.getDayTime() < 0.9f) { 
+	if (map.getDayTime() > 0.0f && map.getDayTime() < 0.9f) { //if daytime, game is not lost
 		return false;
 	}
+
+	CBlob@[] posts;
+	getBlobsByTag("respawn", @posts);
+	if (posts.length() > 0) { //if outpost exists, game is not lost
+		return false;
+	}
+
 
 	bool noAlivePlayers = true;
 	

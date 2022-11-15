@@ -113,10 +113,12 @@ CBlob@ spawnPlayer(CRules@ this, CPlayer@ player)
 			blob.server_Die();
 		}
 
-		CBlob@ newBlob = server_CreateBlob(startClass, 0, getSpawnLocation());
+		Vec2f spawnLocation = getSpawnLocation();
+
+		CBlob@ newBlob = server_CreateBlob(startClass, 0, spawnLocation);
 		newBlob.server_SetPlayer(player);
 		
-		if (this.hasCommandID("give_parachute"))
+		if (this.hasCommandID("give_parachute") && spawnLocation.y == 0)
 		{
 			CBitStream bs;
 			bs.write_netid(newBlob.getNetworkID());
@@ -132,7 +134,16 @@ CBlob@ spawnPlayer(CRules@ this, CPlayer@ player)
 Vec2f getSpawnLocation()
 {
 	const Vec2f dim = getMap().getMapDimensions();
-	return Vec2f(XORRandom(dim.x), 0);
+	Vec2f spawn = Vec2f(XORRandom(dim.x), 0);
+
+	CBlob@[] posts;
+	getBlobsByTag("respawn", @posts);
+
+	if (posts.length() > 0) {
+		spawn = posts[0].getPosition();
+	}
+
+	return spawn;
 }
 
 void syncRespawnTime(CRules@ this, CPlayer@ player, const u32&in time)

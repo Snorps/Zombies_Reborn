@@ -23,7 +23,7 @@ void onInit(CBlob@ this)
 
 	// SHOP
 	this.set_Vec2f("shop offset", Vec2f_zero);
-	this.set_Vec2f("shop menu size", Vec2f(6, 4));
+	this.set_Vec2f("shop menu size", Vec2f(6, 6));
 	this.set_string("shop description", "Buy");
 	this.set_u8("shop icon", 25);
 
@@ -74,6 +74,13 @@ void onInit(CBlob@ this)
 		s.buttonwidth = 2;
 		s.buttonheight = 1;
 		AddRequirement(s.requirements, "coin", "", "Coins", CTFCosts::ballista_bomb_ammo);
+	}
+	{
+		string outpost_icon = getTeamIcon("outpost", "VehicleIcons.png", team_num, Vec2f(32, 32), 6);
+		ShopItem@ s = addShopItem(this, "Outpost", outpost_icon, "outpost", outpost_icon + "\n\n\n" + Descriptions::outpost, false, true);
+		s.crate_icon = 7;
+		AddRequirement(s.requirements, "coin", "", "Coins", CTFCosts::outpost_coins);
+		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", CTFCosts::outpost_gold);
 	}
 }
 
