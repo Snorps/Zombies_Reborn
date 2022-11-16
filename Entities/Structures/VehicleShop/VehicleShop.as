@@ -79,8 +79,7 @@ void onInit(CBlob@ this)
 		string outpost_icon = getTeamIcon("outpost", "VehicleIcons.png", team_num, Vec2f(32, 32), 6);
 		ShopItem@ s = addShopItem(this, "Outpost", outpost_icon, "outpost", outpost_icon + "\n\n\n" + Descriptions::outpost, false, true);
 		s.crate_icon = 7;
-		AddRequirement(s.requirements, "coin", "", "Coins", CTFCosts::outpost_coins);
-		AddRequirement(s.requirements, "blob", "mat_gold", "Gold", CTFCosts::outpost_gold);
+		AddRequirement(s.requirements, "coin", "", "Coins", 300);
 	}
 }
 
