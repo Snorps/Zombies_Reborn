@@ -60,13 +60,7 @@ void onTick(CRules@ this)
 
 	if (map.getDayTime() > 0.85f) {
 		if (showNightStart) {
-			string text = "";
-			if (dayNumber < warmup_days) {
-				text = "Survive.";
-			}
-			else {
-				text = "Survive.\n\nRespawns are now disabled.";
-			}
+			string text = "Zombies are coming. Survive.";
 			setTimedGlobalMessage(this, text, 10);
 			showNightStart = false;
 		}
@@ -143,7 +137,7 @@ void checkDayChange(CRules@ this, const u8&in dayNumber)
 		//end warmup phase
 		if (dayNumber == warmup_days)
 		{
-			dayMessage = "Warmup over. Day "+dayNumber;
+			dayMessage = "Warmup over. Day "+dayNumber+"\n\nYou can no longer respawn without an outpost.";
 			this.SetCurrentState(GAME);
 		}
 		
@@ -217,9 +211,9 @@ const bool isGameLost()
 {
 	CMap@ map = getMap();
 
-	if (map.getDayTime() > 0.0f && map.getDayTime() < 0.9f) { //if daytime, game is not lost
+	/*if (map.getDayTime() > 0.0f && map.getDayTime() < 0.9f) { //if daytime, game is not lost
 		return false;
-	}
+	}*/
 
 	CBlob@[] posts;
 	getBlobsByTag("respawn", @posts);

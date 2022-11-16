@@ -4,7 +4,9 @@
 
 const string startClass = "builder";   //the class that players will spawn as
 const u32 spawnTimeMargin = 8;         //max amount of random seconds we can give to respawns
-const u32 baseRespawnTimeOutpost = 36; //base respawn time when there is an outpost on the map
+const u32 baseRespawnTimeNight= 36; //base respawn time during night
+const u32 baseRespawnTimeDay= 8; //base respawn time during day
+
 
 shared class Respawn
 {
@@ -67,31 +69,15 @@ void onPlayerRequestSpawn(CRules@ this, CPlayer@ player)
 	{
 		CMap@ map = getMap();
 		const f32 dayTime = map.getDayTime();
-	
 		const u32 gametime = getGameTime();
-		const u32 day_cycle = this.daycycle_speed * 60;
+		bool skipWait = this.isWarmup();
 		
-		const u32 timeElapsed = (gametime / getTicksASecond()) % day_cycle;
-		const s32 randomTime = XORRandom(spawnTimeMargin);
-		const s32 timeTillDawn = (day_cycle - timeElapsed + randomTime) * getTicksASecond();
-		
+
 		const bool isDay = dayTime > 0.0f && dayTime < 0.9f;
-		//printf("Player Spawn Requested - Day time: " + dayTime + "    Is Day: " + isDay + "    Random Additional Time: " + randomTime + "    Time Till Dawn: " + (timeTillDawn/getTicksASecond()) + "    Game Time: " + (gametime/getTicksASecond()));
-		
-		bool skipWait = isDay || this.isWarmup();
+		const s32 baseTime = isDay ? baseRespawnTimeDay : baseRespawnTimeNight;
+		const s32 randomTime = (baseTime + XORRandom(spawnTimeMargin)) * getTicksASecond();
 
-		//printf("Skip wait: " + skipWait);
-
-		s32 timeTillRespawn = skipWait ? 0 : timeTillDawn;
-
-		//printf("timetillresppawn:" + timeTillRespawn/getTicksASecond());
-
-		CBlob@[] posts;
-		getBlobsByTag("respawn", @posts);
-		//printf("outposts: " + posts.length());
-		if (posts.length() > 0 && timeTillRespawn > baseRespawnTimeOutpost) { //reduce respawn time if outpost is present
-			timeTillRespawn = (baseRespawnTimeOutpost + XORRandom(spawnTimeMargin)) * getTicksASecond();
-		}
+		const s32 timeTillRespawn = skipWait ? 0 : randomTime;
 
 		Respawn r(player.getUsername(), timeTillRespawn + gametime);
 		this.push("respawns", r);
