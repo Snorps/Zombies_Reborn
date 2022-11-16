@@ -38,6 +38,16 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 	player.server_setTeamNum(0);
 }
 
+u32 getZombieSpawnDelay(u8 dayNumber) {
+	//linear
+	const f32 difficulty = days_to_survive / (dayNumber * game_difficulty);
+	//wavey
+	//const f32 difficulty = days_to_survive / (dayNumber * (game_difficulty + Maths::Sin(dayNumber)));
+
+	return getTicksASecond() * difficulty;
+}
+
+bool debugShowZombieDays = true;
 bool showNightStart = true;
 bool makeOutpostCrate = true;
 void onTick(CRules@ this)
@@ -48,9 +58,17 @@ void onTick(CRules@ this)
 	const u32 day_cycle = this.daycycle_speed * 60;
 	const u8 dayNumber = (gameTime / getTicksASecond() / day_cycle) + 1;
 	
-	//spawn zombies at night-time
-	const f32 difficulty = days_to_survive / (dayNumber * game_difficulty);
-	const u32 spawnRate = getTicksASecond() * difficulty;
+	//debug stuff
+	if (g_debug == 1 && debugShowZombieDays)
+	{
+		debugShowZombieDays = false;
+		for (u8 i = 1; i < days_to_survive; i++)
+		{
+			printf("zombie spawn delay at day " + i + ": " + getZombieSpawnDelay(i));
+		}
+	}
+
+	const u32 spawnDelay = getZombieSpawnDelay(dayNumber);
 
 	const Vec2f dim = getMap().getMapDimensions();
 	if (gameTime % 150 == 0 && makeOutpostCrate) {	
@@ -69,7 +87,7 @@ void onTick(CRules@ this)
 		showNightStart = true;
 	}
 
-	if (gameTime % spawnRate == 0)
+	if (gameTime % spawnDelay == 0)
 	{
 		spawnZombie(map);
 	}
