@@ -93,11 +93,12 @@ bool onServerProcessChat(CRules@ this, const string& in text_in, string& out tex
 					this.SetCurrentState(GAME);
 					return false;
 				}				
-				else if (tokens[0] == "!respawn") //print the amount of undeads
+				else if (tokens[0] == "!respawn") //respawn player instantly
 				{
-					Respawn r(player.getUsername(), getGameTime());
+					const u32 gameTime = getGameTime();
+					Respawn r(player.getUsername(), gameTime);
 					this.push("respawns", r);
-					syncRespawnTime(this, player, getGameTime());
+					syncRespawnTime(this, player, gameTime);
 					return false;
 				}
 			}
