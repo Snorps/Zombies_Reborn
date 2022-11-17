@@ -1,3 +1,5 @@
+#include "Zombie_Respawning.as";
+
 // Zombie Fortress chat commands
 
 const string commandslist()
@@ -84,6 +86,18 @@ bool onServerProcessChat(CRules@ this, const string& in text_in, string& out tex
 					CBlob@[] undeads;
 					getBlobsByTag("undead", @undeads);
 					print(undeads.length+" undeads found");
+					return false;
+				}				
+				else if (tokens[0] == "!endwarmup") //print the amount of undeads
+				{
+					this.SetCurrentState(GAME);
+					return false;
+				}				
+				else if (tokens[0] == "!respawn") //print the amount of undeads
+				{
+					Respawn r(player.getUsername(), getGameTime());
+					this.push("respawns", r);
+					syncRespawnTime(this, player, getGameTime());
 					return false;
 				}
 			}
