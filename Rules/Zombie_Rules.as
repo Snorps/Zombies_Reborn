@@ -5,9 +5,10 @@
 
 #define SERVER_ONLY
 
-const u8 warmup_days = 2;       //days of warmup-time we give to players
-const u8 days_to_survive = 15;   //days players must survive to win
-const f32 game_difficulty = 2.5f; //zombie spawnrate multiplier
+u8 warmup_days = 2;          //days of warmup-time we give to players
+u8 days_to_survive = 15;     //days players must survive to win, use 0 for no win condition
+f32 game_difficulty = 2.5f;  //zombie spawnrate multiplier
+u16 maximum_zombies = 400;   //maximum amount of zombies that can be on the map at once
 
 const u8 GAME_WON = 5;
 const u8 nextmap_seconds = 15;
@@ -25,6 +26,17 @@ void onRestart(CRules@ this)
 
 void Reset(CRules@ this)
 {
+	ConfigFile cfg;
+	const string file = "../Cache/Zombie_Vars.cfg";
+	if (CFileMatcher(file).hasMatch() ? cfg.loadFile(file) : cfg.loadFile("Zombie_Vars.cfg"))
+	{
+		//edit these vars in Zombie_Vars.cfg
+		warmup_days     = cfg.exists("warmup_days")     ? cfg.read_u8("warmup_days")      : 2;
+		days_to_survive = cfg.exists("days_to_survive") ? cfg.read_u8("days_to_survive")  : 15;
+		game_difficulty = cfg.exists("game_difficulty") ? cfg.read_f32("game_difficulty") : 2.5f;
+		maximum_zombies = cfg.exists("maximum_zombies") ? cfg.read_u16("maximum_zombies") : 400;
+	}
+	
 	this.set_u8("day_number", 1);
 	this.set_u8("message_timer", 1);
 	
@@ -89,7 +101,7 @@ void onTick(CRules@ this)
 
 	if (gameTime % spawnDelay == 0)
 	{
-		spawnZombie(map);
+		spawnZombie(this, map);
 	}
 	
 	if (gameTime % getTicksASecond() == 0) //once every second
@@ -103,10 +115,12 @@ void onTick(CRules@ this)
 }
 
 // Spawn various zombie blobs on the map
-void spawnZombie(CMap@ map)
+void spawnZombie(CRules@ this, CMap@ map)
 {
 	if (map.getDayTime() > 0.9f || map.getDayTime() < 0.1f)
 	{
+		if (maximum_zombies != 999 && this.get_u16("undead count") >= maximum_zombies) return;
+		
 		const u32 r = XORRandom(100);
 		
 		string blobname = "skeleton"; //leftover       // 40%
@@ -162,7 +176,7 @@ void checkDayChange(CRules@ this, const u8&in dayNumber)
 		setTimedGlobalMessage(this, dayMessage, 10);
 		
 		//end game if we reached the last day
-		if (dayNumber >= days_to_survive)
+		if (dayNumber >= days_to_survive && days_to_survive != 0)
 		{
 			dayMessage = "Day "+days_to_survive+" Reached! You win!";
 			this.SetCurrentState(GAME_WON);
