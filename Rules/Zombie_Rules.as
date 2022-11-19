@@ -24,6 +24,7 @@ void onRestart(CRules@ this)
 	Reset(this);
 }
 
+bool makeOutpostCrate = true;
 void Reset(CRules@ this)
 {
 	ConfigFile cfg;
@@ -40,6 +41,7 @@ void Reset(CRules@ this)
 	this.set_u8("day_number", 1);
 	this.set_u8("message_timer", 1);
 	
+	makeOutpostCrate = true;
 	seconds_till_nextmap = nextmap_seconds;
 	this.SetCurrentState(WARMUP);
 }
@@ -61,7 +63,6 @@ u32 getZombieSpawnDelay(u8 dayNumber) {
 
 bool debugShowZombieDays = true;
 bool showNightStart = true;
-bool makeOutpostCrate = true;
 void onTick(CRules@ this)
 {
 	CMap@ map = getMap();
