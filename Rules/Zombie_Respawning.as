@@ -4,8 +4,8 @@
 
 const string startClass = "builder";   //the class that players will spawn as
 const u32 spawnTimeMargin = 8;         //max amount of random seconds we can give to respawns
-const u32 baseRespawnTimeNight= 36; //base respawn time during night
-const u32 baseRespawnTimeDay= 8; //base respawn time during day
+const u32 baseRespawnTimeDay = 8; //base respawn time during day
+const u32 nightRespawnGracePeriod = 10; //number of seconds to secretly delay hardcore respawns after each night starts
 
 
 shared class Respawn
@@ -41,6 +41,7 @@ void onRestart(CRules@ this)
 	}
 }
 
+float lastDayTime = 0;
 void onTick(CRules@ this)
 {
 	const u32 gametime = getGameTime();
@@ -60,6 +61,13 @@ void onTick(CRules@ this)
 			}
 		}
 	}
+	if (g_debug == 1) {
+		const u32 newTime = Maths::Floor(getMap().getDayTime() * 10);
+		if (newTime != lastDayTime) {
+			lastDayTime = newTime;
+			printf("Day time is " + float(newTime)/10);
+		}
+	}
 }
 
 
@@ -69,26 +77,51 @@ void onPlayerRequestSpawn(CRules@ this, CPlayer@ player)
 	{
 		CMap@ map = getMap();
 		const f32 dayTime = map.getDayTime();
-		const u32 gametime = getGameTime();
-		bool skipWait = this.isWarmup();
+		
 		
 
-		const bool isDay = dayTime > 0.1f && dayTime < 0.9f;
-
+		const u32 gameTime = getGameTime();
 		const u32 day_cycle = this.daycycle_speed * 60;
-		const u32 timeElapsed = (gametime / getTicksASecond()) % day_cycle;
-		const s32 timeTillDawn = (day_cycle - timeElapsed) * getTicksASecond();
-		printf("Time till dawn: " + timeTillDawn);
+		const u8 dayNumber = (gameTime / getTicksASecond() / day_cycle) + 1;
+
+		//const u32 timeElapsed = (gametime / getTicksASecond()) % day_cycle;
+		//const s32 timeTillDawn = (day_cycle - timeElapsed) / 2;
+
+		const float datetime = dayTime + dayNumber;
+		float nextDawn;
+		if (dayTime < 0.1) {
+			nextDawn = dayNumber + 0.1;
+		} else
+		{
+			nextDawn = dayNumber + 1.1;
+		}
+		//find difference between current datetime and next increment of 1.1 (i.e next increment - current datetime)
+		const float dawnDelta = nextDawn - (dayTime + dayNumber);
+		//multiple by day_cycle
+		const s32 timeTillDawn = (dawnDelta) * day_cycle;
+
+		if (g_debug == 1) {
+			printf("datetime: " + datetime + "    nextDawn: " + nextDawn + "    dawnDelta: " + dawnDelta);
+		}
+
+		const float gracePeriod = float(nightRespawnGracePeriod)/float(day_cycle);
+		const bool isDay = dayTime > 0.1f && dayTime < 0.9f + gracePeriod;
 
 
-		const s32 baseTime = isDay ? baseRespawnTimeDay : baseRespawnTimeNight;
-		const s32 randomTime = (baseTime + XORRandom(spawnTimeMargin)) * getTicksASecond();
+		const s32 baseTime = isDay ? baseRespawnTimeDay : timeTillDawn;
+		const s32 randomTime = (baseTime + XORRandom(spawnTimeMargin));
 
-		const s32 timeTillRespawn = skipWait ? 0 : randomTime;
 
-		Respawn r(player.getUsername(), timeTillRespawn + gametime);
+		bool skipWait = this.isWarmup();
+		const s32 timeTillRespawn = skipWait ? 0 : randomTime * getTicksASecond();
+
+		if (g_debug == 1) {
+			printf("Skip wait?: " + skipWait + "    timeTillDawn: " + timeTillDawn + "    Base respawn time: " + baseTime);
+		}
+
+		Respawn r(player.getUsername(), timeTillRespawn + gameTime);
 		this.push("respawns", r);
-		syncRespawnTime(this, player, timeTillRespawn + gametime);
+		syncRespawnTime(this, player, timeTillRespawn + gameTime);
 	}
 }
 
