@@ -50,14 +50,24 @@ void onTick(CRules@ this)
 		Respawn[]@ respawns;
 		if (!this.get("respawns", @respawns)) return;
 		
+		CBlob@[] posts;
+		getBlobsByTag("respawn", @posts);
+
 		for (u8 i = 0; i < respawns.length; i++)
 		{
 			Respawn@ r = respawns[i];
 			if (r.timeStarted == 0 || r.timeStarted <= gametime)
 			{
-				spawnPlayer(this, getPlayerByUsername(r.username));
-				respawns.erase(i);
-				i = 0;
+				if (this.isWarmup() || posts.length() >= 1) {
+					spawnPlayer(this, getPlayerByUsername(r.username));
+					respawns.erase(i);
+					i = 0;
+				} else { //if no outpost is present and not in warm-up
+					if (g_debug == 1) {
+						printf("not respawning player due to no outpossst!");
+						printf("" + posts.length());
+					}
+				}
 			}
 		}
 	}

@@ -16,7 +16,7 @@ void onRender(CRules@ this)
 	const u32 time = this.get_u32("respawn time") + 30;
 	const s32 time_left = (time - gameTime) / getTicksASecond();
 	
-	const string text = time_left > 100 ? ZombieDesc::respawn : getTranslatedString("Respawning in: {SEC}").replace("{SEC}", "" + time_left);
+	const string text = time_left > 10000000 ? "Waiting for an outpost to be built before respawn." : getTranslatedString("Respawning in: {SEC}").replace("{SEC}", "" + time_left);
 	
 	GUI::SetFont("menu");
 	GUI::DrawTextCentered(text, Vec2f(getScreenWidth()/2, 200 + Maths::Cos(gameTime/10.0f)*8), SColor(0xFFE0BA16));
