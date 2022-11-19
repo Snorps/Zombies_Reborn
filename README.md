@@ -10,7 +10,8 @@ Discord -
 https://discord.gg/V29BBeba3C
 <br>
 
-This version of Zombie Fortress has been modified to provide a more forgiving experience that is accessible to new players.
+<h2>Modifications</h2>
+This version of Zombie Fortress has been modified by the various snorps to provide a more forgiving experience that is accessible to new players.
 <a href="https://github.com/Snorps/Zombies_Reborn">Github Link</a>
 
 <h2>Credits</h2>
