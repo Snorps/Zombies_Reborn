@@ -228,8 +228,7 @@ void onGameEnd(CRules@ this)
 	}
 }
 
-void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData)
-{
+void loseIfAllPlayersDead(CRules@ this) {
 	if (this.isWarmup()) return;
 	
 	//have all players died?
@@ -237,6 +236,16 @@ void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData
 	
 	this.SetCurrentState(GAME_OVER);
 	setTimedGlobalMessage(this, "Game over! All survivors perished! You lasted "+this.get_u8("day_number")+" days.", nextmap_seconds);
+}
+
+void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData) {
+	loseIfAllPlayersDead(this);
+}
+
+void onBlobDie(CRules@ this, CBlob@ blob) {
+	if (blob.getName() == "outpost") {
+		loseIfAllPlayersDead(this);
+	}
 }
 
 // Check if we lost the game
